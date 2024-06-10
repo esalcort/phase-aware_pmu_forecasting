@@ -174,7 +174,6 @@ def generate_run_length(discrete_series, max_length, classes_mean, shift_length=
 		else:
 			rle_df.loc[index_value, "length"] = group_count - 1
 		items_count += group_count
-	# rle_df = rle_df.dropna().astype({"bin_label": "int"})
-	rle_df = rle_df.dropna(subset=['bin_label']).bfill().astype({"bin_label": "int"})
-	# rle_df["bin_values"] = rle_df["bin_label"].replace(classes_mean)
+	
+	rle_df = rle_df.dropna(subset=['bin_label']).astype(float).bfill().astype({"bin_label": "int"})
 	return rle_df

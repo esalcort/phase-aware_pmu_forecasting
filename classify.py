@@ -102,7 +102,7 @@ class Tier2Phases:
                 per_core_buffers.append(buffers)
             buffers = pd.concat(per_core_buffers, keys=corenames)
 
-        return buffers.fillna(0)
+        return buffers.astype(float).fillna(0)
     
     def _get_phases(self, subphases, buffers):
         if subphases.index.nlevels == 1:
@@ -160,7 +160,7 @@ def pre_classification(raw, filter_size, multicore=False):
         df = raw
     if multicore:
         # The scaler needs to be the same for each core
-        temp_df = df.stack(0)
+        temp_df = df.stack(0, future_stack=True)
         scaler = MinMaxScaler()
         scaler.fit(temp_df)
         corenames = df.columns.get_level_values(0).unique()
