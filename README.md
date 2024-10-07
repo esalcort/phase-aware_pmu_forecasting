@@ -53,15 +53,15 @@ The code is currently being cleaned and formatted to make it easier to use by pe
 | Feature | Estimated Release Date |
 | --------| ---------------------- |
 | ~~Multi-core phase classification~~ | ~~02/10/2023~~ |
-| Multi-core basic forecasting (phase-unaware) | 02/21/2023 |
-| Multi-core window-based phase prediction | 03/07/2023 |
-| Multi-core phase-based forecasting | 03/21/2023 |
-| Multi-core phase-aware forecasting | 04/04/2023 |
-| Multi-core phase change prediction | 04/18/2023 |
-| Multi-core phase duration prediction | 05/01/2023 |
-| Single-core phase classification | 05/15/2023 |
-| Single-core phase prediction | 05/29/2023 |
-| Single-core phase-based forecasting | 06/12/2023 |
+| Multi-core basic forecasting (phase-unaware) | TBD |
+| Multi-core window-based phase prediction | TBD |
+| Multi-core phase-based forecasting | TBD |
+| Multi-core phase-aware forecasting | TBD |
+| Multi-core phase change prediction | TBD |
+| Multi-core phase duration prediction | TBD |
+| Single-core phase classification | TBD |
+| Single-core phase prediction | TBD |
+| Single-core phase-based forecasting | TBD |
 
 
 ## References
