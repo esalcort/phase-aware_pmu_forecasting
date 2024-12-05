@@ -46,6 +46,14 @@ python classify.py --dataset set104 --benchmark nab --classifier 2kmeans --phase
 python classify.py --dataset set104 --benchmark nab --classifier gmm --phase_count 4 --filter_size 21 --multicore_phases local --input_counters CPI L2_RQSTS.MISS OFFCORE_REQUESTS.DEMAND_DATA_RD FP_ARITH_INST_RETIRED.SCALAR_DOUBLE BR_MISP_RETIRED.ALL_BRANCHES 
 ```
 
+### Single core basic workload forecasting
+The [forecasting.py](forecasting.py) script supports training and evaluation of basic forecasting of single-core workloads. Multiple models and different settings are supported. See the *supervised_model_args* method in [input_parser.py](src/input_parser.py) or the help option ```python forecasting.py --help``` for more details.
+
+Sample usage:
+```bash
+python forecasting.py --benchmark 520_0 --dataset x86_homogeneous_3GHz/ --input_counters CPI BR_PI BR_MPI --timesteps 2 --forecast_horizon 2 --scaler minmax --filter median
+```
+
 ## Work in progress
 
 The code is currently being cleaned and formatted to make it easier to use by people other than the authors. We have outlined a plan with release dates in stages below. Contact Susy at esalcort@utexas.edu if you need a copy of the code in advance.
