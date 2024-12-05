@@ -38,12 +38,12 @@ The output of this script has a list per-CPU classification metrics.
 
 We support three definitions of phases as defined in [1]: *global*, *local*, and *local+shared*. They can be set with the *--multicore_phases* input argument. We also support different classification models, including *2kmeans* and *fgmm*, as defined in [1]. The examples below classify the data in *Data/set104/644.nab_s0.csv*.
 * *2kmeans* example that classifies data into 6 global phases, and uses a window size of 21 to define the sencond-level phases of *2kmeans*.
-```shell
+```bash
 python classify.py --dataset set104 --benchmark nab --classifier 2kmeans --phase_count 6 --W 21 --multicore_phases global --input_counters CPI L2_RQSTS.MISS OFFCORE_REQUESTS.DEMAND_DATA_RD FP_ARITH_INST_RETIRED.SCALAR_DOUBLE BR_MISP_RETIRED.ALL_BRANCHES 
 ```
 * *fgmm* example that classifies data into 4 phases per CPU, and uses a filter size of 21 before classifying with gaussian mixture models (GMM).
-```shell
-python classify.py --dataset set104 --benchmark nab --classifier gmm --phase_count 5 --filter_size 21 --multicore_phases global --input_counters CPI L2_RQSTS.MISS OFFCORE_REQUESTS.DEMAND_DATA_RD FP_ARITH_INST_RETIRED.SCALAR_DOUBLE BR_MISP_RETIRED.ALL_BRANCHES 
+```bash
+python classify.py --dataset set104 --benchmark nab --classifier gmm --phase_count 4 --filter_size 21 --multicore_phases local --input_counters CPI L2_RQSTS.MISS OFFCORE_REQUESTS.DEMAND_DATA_RD FP_ARITH_INST_RETIRED.SCALAR_DOUBLE BR_MISP_RETIRED.ALL_BRANCHES 
 ```
 
 ## Work in progress

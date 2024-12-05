@@ -76,6 +76,9 @@ single_norm_counters = {
 	'LONGEST_LAT_CACHE.MISS'				:	'LLC_MPI',
 	'L2_RQSTS.MISS'							:	'L2_MPI',
 	'OFFCORE_REQUESTS.DEMAND_DATA_RD'		:	'OFFCORE_DATA_RD_PI',
+	'br_inst_retired.all_branches_pebs:u'   :   'BR_PI',
+	'br_misp_retired.all_branches_pebs:u'   :   'BR_MPI',
+	'cpu-cycles:u'							:	'CPI',
 }
 single_rate_counters = {
 	'L2_RQSTS.DEMAND_DATA_RD_HIT'	:	['L2_RQSTS.ALL_DEMAND_DATA_RD', 'L2_HIT_RATE'],
@@ -87,6 +90,7 @@ single_rate_counters = {
 def get_raw_data(benchmark, dataset, ref=0, folder=DEFAULT_FOLDER):
 	# This method reads a CSV file (and it's not compatible with emon format). It
 	# returns a pandas Data frame
+	set_folder = os.path.join(folder, dataset)
 	if benchmark in BENCHMARKS:
 		bm =  BENCHMARKS[benchmark]
 		filename = bm.number + '.' + bm.name + str(ref) + '.csv'
@@ -97,12 +101,15 @@ def get_raw_data(benchmark, dataset, ref=0, folder=DEFAULT_FOLDER):
 	elif benchmark in PARSEC_BENCHMARKS:
 		filename = benchmark + '.csv'
 	else:
-		print('Data for benchmark %s not available'%(benchmark))
-		print('Available benchmarks:')
-		print(BENCHMARKS.keys())
-		print(PARSEC_BENCHMARKS)
-		return None
-	set_folder = os.path.join(folder, dataset)
+		filename = benchmark + '.csv'
+		if os.path.exists(os.path.join(set_folder, filename)):
+			pass
+		else:
+			print('Data for benchmark %s not available'%(benchmark))
+			print('Available benchmarks:')
+			print(BENCHMARKS.keys())
+			print(PARSEC_BENCHMARKS)
+			return None
 	path = os.path.join(set_folder, filename)
 	multicore = False
 	with open(path) as f:
@@ -127,10 +134,15 @@ def get_processed_data(data):
 		return pd.concat(percore, axis=1, keys=corenames)
 	proc_data = pd.DataFrame()
 	missing = []
+	instr_counter = ''
+	if 'instructions:u' in data.columns:
+		instr_counter = 'instructions:u'
+	else:
+		instr_counter = 'INST_RETIRED.ANY'
 	for value in data.columns.values:
 		if value in single_norm_counters:
 			name = single_norm_counters[value]
-			proc_data[name] = data[value] / data['INST_RETIRED.ANY']
+			proc_data[name] = data[value] / data[instr_counter]
 		elif value not in fixed_counters:
 			missing.append(value)
 	if 'L2_RQSTS.ALL_DEMAND_DATA_RD' in data.columns.values:

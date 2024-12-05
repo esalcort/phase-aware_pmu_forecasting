@@ -4,8 +4,9 @@ def set_experiment_args(parser):
 	parser.add_argument('--benchmark',			required=True)
 	parser.add_argument('--dataset',			required=True,	help='Name of the dataset in the Data folder')
 	parser.add_argument('--predictions_csv',	action='store_true',	help='Save predictions in csv format')
-	parser.add_argument('--test_split',			type=int,	default=70)
+	parser.add_argument('--train_size',			type=int,	default=70)
 	parser.add_argument('--results_folder',		default='results',	help='Folder to save results')
+	parser.add_argument('--name',				default='', help='Experiment name used for results filenames')
 	return parser
 
 def set_preprocess_args(parser):
@@ -24,6 +25,27 @@ def set_preprocess_args(parser):
 	parser.add_argument('--filter_size',		type=int, default=3)
 	return parser
 
+def supervised_model_args(parser):
+	parser.add_argument("--batch_size",			type = int, default = 16)
+	parser.add_argument("--epochs",				type = int, default = 10)
+	parser.add_argument("--neurons",			type = int, default = 1)
+	parser.add_argument("--stateless",			action = "store_true")
+	parser.add_argument("--model",				default = "lstm", choices = ["lstm", "stacked_lstm", "mlp", "svm", "mp", 'dt', 'lr'])
+	parser.add_argument("--dense_hidden_layers", type = int, default = [], nargs = '+')
+	parser.add_argument("--early_stopping",		action = "store_true")
+	parser.add_argument("--patience",			type = int, default = 5)
+	parser.add_argument("--loss_function",		default = "mse", choices = ["mse", "mean_squared_error", "mae", "mean_absolute_error", "mean_absolute_percentage_error", "mean_squared_logarithmic_error"])
+	parser.add_argument("--regression_activation",	default='linear', choices=['relu', 'linear', 'tanh', 'sigmoid'])
+	parser.add_argument("--optimizer",			default = "adam", choices = ["sgd", "RMSprop", "adagrad", "adadelta", "adam", "adamax", "nadam"])
+	parser.add_argument("--svm_kernel",			default = "rbf", choices = ["linear", "poly", "rbf", "sigmoid"])
+	parser.add_argument("--svm_regularization",	type = float, default = 1.0)
+	parser.add_argument("--svm_epsilon",		type = float, default = 0.1)
+	parser.add_argument("--max_iter",			type = int, default = -1)
+	parser.add_argument("--stacked_layers",		type = int, default = 2)
+	parser.add_argument("--tree_max_depth",		type = int, default = 3)
+	return parser
+	
+
 def get_input_args(caller_file, input_args=None):
 	parser = argparse.ArgumentParser()
 	parser = set_experiment_args(parser)
@@ -37,6 +59,12 @@ def get_input_args(caller_file, input_args=None):
 		parser.add_argument('--W',						type=int,	default=100)
 		parser.add_argument('--N1',						type=int,	default=10)
 		parser.add_argument('--multicore_phases', 		choices=['local', 'global', 'local+shared'])
+	
+	if 'forecasting' in caller_file:
+		parser.add_argument("--timesteps",			type = int, default=1, help='Number of input timesteps')
+		parser.add_argument("--forecast_horizon",	type = int, default=1, help="Number of output timesteps")
+		# parser.add_argument("--no_deltas",			action = "store_true", help= "Do not use relative counter changes")
+		parser = supervised_model_args(parser)
 
 	if input_args:
 		args = parser.parse_args(args=input_args)
