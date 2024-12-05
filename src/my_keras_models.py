@@ -1,10 +1,15 @@
 from keras.models import Sequential, Model
-from keras.layers import Dense, LSTM, Input
+from keras.layers import Dense, LSTM, Input, InputLayer
 
+def reset_model_states(model):
+	for layer in model.layers:
+		if hasattr(layer, 'reset_states'):
+			layer.reset_states()
 
 def get_lstm_model(shape, neurons, stateful=True, class_count=1, dense_hidden_layers=[], loss="mse", optimizer="adam", activation="linear"):
 	model = Sequential()
-	model.add(LSTM(neurons, batch_input_shape=shape, stateful=stateful))
+	model.add(InputLayer(batch_input_shape=shape))
+	model.add(LSTM(neurons, stateful=stateful))
 	for neurons in dense_hidden_layers:
 		model.add(Dense(neurons))
 	model.add(Dense(class_count, activation=activation))
@@ -38,7 +43,8 @@ def get_mlp_model(shape, in_neurons, class_count, dense_layers, loss, optimizer,
 def get_stacked_lstm_model(shape, neurons, stateful=True, class_count=1, loss="mse", optimizer="adam", stacked_layers=2, activation="linear"):
 	model = Sequential()
 	# Input LSTM layer
-	model.add(LSTM(neurons, batch_input_shape=shape, stateful=stateful, return_sequences=True))
+	model.add(InputLayer(batch_input_shape=shape))
+	model.add(LSTM(neurons, stateful=stateful, return_sequences=True))
 	# Stacked LSTM hidden layers
 	for _ in range(2, stacked_layers):
 		model.add(LSTM(neurons, stateful=stateful, return_sequences=True))

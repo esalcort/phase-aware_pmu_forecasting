@@ -2,9 +2,8 @@ import pandas as pd
 import numpy as np
 import os
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-import matplotlib.pyplot as plt
 import src.preprocess as pp
-from src.my_keras_models import get_model
+from src.my_keras_models import get_model, reset_model_states
 from sklearn.svm import SVR, SVC, LinearSVR
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.tree import DecisionTreeRegressor
@@ -99,7 +98,7 @@ class Predictor:
                                     batch_size=args.batch_size,
                                     epochs=args.epochs, shuffle=True,
                                     verbose=0, callbacks=callbacks)
-            self.model.reset_states()
+            reset_model_states(self.model)
             self.model.load_weights(saved_model_name+'.h5')
             if early_stopping_monitor.stopped_epoch != 0:
                 print("[Predictor.py] Stopped epoch: ", early_stopping_monitor.stopped_epoch)
@@ -107,7 +106,7 @@ class Predictor:
             history = self.model.fit(X, y, validation_data=(vX, vy),
                                     batch_size=args.batch_size,
                                     epochs=args.epochs, shuffle=True, verbose=0)
-        self.model.reset_states()
+        reset_model_states(self.model)
         output = self.model.predict(vX, batch_size=args.batch_size)
         return output
 
