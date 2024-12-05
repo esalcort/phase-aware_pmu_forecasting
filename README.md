@@ -38,21 +38,35 @@ The output of this script has a list per-CPU classification metrics.
 
 We support three definitions of phases as defined in [1]: *global*, *local*, and *local+shared*. They can be set with the *--multicore_phases* input argument. We also support different classification models, including *2kmeans* and *fgmm*, as defined in [1]. The examples below classify the data in *Data/set104/644.nab_s0.csv*.
 * *2kmeans* example that classifies data into 6 global phases, and uses a window size of 21 to define the sencond-level phases of *2kmeans*.
-```bash
-python classify.py --dataset set104 --benchmark nab --classifier 2kmeans --phase_count 6 --W 21 --multicore_phases global --input_counters CPI L2_RQSTS.MISS OFFCORE_REQUESTS.DEMAND_DATA_RD FP_ARITH_INST_RETIRED.SCALAR_DOUBLE BR_MISP_RETIRED.ALL_BRANCHES 
-```
+    ```bash
+    python classify.py --dataset set104 --benchmark nab --classifier 2kmeans --phase_count 6 --W 21 --multicore_phases global --input_counters CPI L2_RQSTS.MISS OFFCORE_REQUESTS.DEMAND_DATA_RD FP_ARITH_INST_RETIRED.SCALAR_DOUBLE BR_MISP_RETIRED.ALL_BRANCHES 
+    ```
 * *fgmm* example that classifies data into 4 phases per CPU, and uses a filter size of 21 before classifying with gaussian mixture models (GMM).
-```bash
-python classify.py --dataset set104 --benchmark nab --classifier gmm --phase_count 4 --filter_size 21 --multicore_phases local --input_counters CPI L2_RQSTS.MISS OFFCORE_REQUESTS.DEMAND_DATA_RD FP_ARITH_INST_RETIRED.SCALAR_DOUBLE BR_MISP_RETIRED.ALL_BRANCHES 
-```
+    ```bash
+    python classify.py --dataset set104 --benchmark nab --classifier gmm --phase_count 4 --filter_size 21 --multicore_phases local --input_counters CPI L2_RQSTS.MISS OFFCORE_REQUESTS.DEMAND_DATA_RD FP_ARITH_INST_RETIRED.SCALAR_DOUBLE BR_MISP_RETIRED.ALL_BRANCHES 
+    ```
 
 ### Single core basic workload forecasting
 The [forecasting.py](forecasting.py) script supports training and evaluation of basic forecasting of single-core workloads. Multiple models and different settings are supported. See the *supervised_model_args* method in [input_parser.py](src/input_parser.py) or the help option ```python forecasting.py --help``` for more details.
 
-Sample usage:
-```bash
-python forecasting.py --benchmark 520_0 --dataset x86_homogeneous_3GHz/ --input_counters CPI BR_PI BR_MPI --timesteps 2 --forecast_horizon 2 --scaler minmax --filter median
-```
+Examples:
+* Inputs 10 timesteps and output forecast horizon 2, scaled and filter data for preprocessing. The default model is LSTM, and it will be 16 cells wide and run for 100 epuchs.
+    ```bash
+    python forecasting.py --benchmark 520_0 --dataset x86_homogeneous_3GHz/ --input_counters CPI BR_PI BR_MPI --timesteps 10 --forecast_horizon 2 --scaler minmax --filter median --neurons 16 --epochs 100 --filter_size 5
+    ```
+* The following example shows how to select stacked LSTM (multiple LSTM layers) and enable early stopping
+    ```bash
+    python forecasting.py --benchmark 520_0 --dataset x86_homogeneous_3GHz/ --input_counters CPI BR_PI BR_MPI --timesteps 10 --forecast_horizon 2 --scaler minmax --filter median --neurons 16 --epochs 100 --early_stopping --patience 5 --model stacked_lstm
+    ```
+* Example with Multi-layer perceptron (MLP)
+    ```bash
+    python forecasting.py --benchmark 520_0 --dataset x86_homogeneous_3GHz/ --input_counters CPI BR_PI BR_MPI --timesteps 10 --forecast_horizon 2 --scaler minmax --filter median --epochs 100 --model mlp --dense_hidden_layers 50 50
+    ```
+* Example with support vector machine (SVM)
+    ```bash
+    python forecasting.py --benchmark 520_0 --dataset x86_homogeneous_3GHz/ --input_counters CPI BR_PI BR_MPI --timesteps 10 --forecast_horizon 2 --scaler minmax --filter median --model svm
+    ```
+
 
 ## Work in progress
 

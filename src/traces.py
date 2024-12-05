@@ -143,7 +143,7 @@ def get_processed_data(data):
 		if value in single_norm_counters:
 			name = single_norm_counters[value]
 			proc_data[name] = data[value] / data[instr_counter]
-		elif value not in fixed_counters:
+		elif value not in fixed_counters and value != instr_counter:
 			missing.append(value)
 	if 'L2_RQSTS.ALL_DEMAND_DATA_RD' in data.columns.values:
 		if 'L2_RQSTS.DEMAND_DATA_RD_HIT' in data.columns.values:
