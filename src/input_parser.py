@@ -27,11 +27,11 @@ def set_preprocess_args(parser):
 
 def supervised_model_args(parser):
 	parser.add_argument("--batch_size",			type = int, default = 16)
-	parser.add_argument("--epochs",				type = int, default = 10)
-	parser.add_argument("--neurons",			type = int, default = 1)
+	parser.add_argument("--epochs",				type = int, default = 100)
+	parser.add_argument("--neurons",			type = int, default = 16)
 	parser.add_argument("--stateless",			action = "store_true")
 	parser.add_argument("--model",				default = "lstm", choices = ["lstm", "stacked_lstm", "mlp", "svm", "mp", 'dt', 'lr'])
-	parser.add_argument("--dense_hidden_layers", type = int, default = [], nargs = '+')
+	parser.add_argument("--dense_hidden_layers", type = int, default = [50, 50], nargs = '+')
 	parser.add_argument("--early_stopping",		action = "store_true")
 	parser.add_argument("--patience",			type = int, default = 5)
 	parser.add_argument("--loss_function",		default = "mse", choices = ["mse", "mean_squared_error", "mae", "mean_absolute_error", "mean_absolute_percentage_error", "mean_squared_logarithmic_error"])

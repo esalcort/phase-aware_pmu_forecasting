@@ -93,13 +93,13 @@ class Predictor:
                                         args.benchmark+'_'+str(np.random.randint(10,100)))
         if args.early_stopping:
             early_stopping_monitor = EarlyStopping(monitor=monitor, patience=args.patience)
-            callbacks = [early_stopping_monitor, ModelCheckpoint(filepath=saved_model_name+'.h5', monitor=monitor, save_best_only=True)]
+            callbacks = [early_stopping_monitor, ModelCheckpoint(filepath=saved_model_name+'.keras', monitor=monitor, save_best_only=True)]
             history = self.model.fit(X, y, validation_data=(vX, vy),
                                     batch_size=args.batch_size,
                                     epochs=args.epochs, shuffle=True,
                                     verbose=0, callbacks=callbacks)
             reset_model_states(self.model)
-            self.model.load_weights(saved_model_name+'.h5')
+            self.model.load_weights(saved_model_name+'.keras')
             if early_stopping_monitor.stopped_epoch != 0:
                 print("[Predictor.py] Stopped epoch: ", early_stopping_monitor.stopped_epoch)
         else:
@@ -140,6 +140,9 @@ class Regressor(Predictor):
                     epsilon=args.svm_epsilon,
                     max_iter=args.max_iter,
                 )
+            
+            if args.forecast_horizon > 1:
+                self.model = MultiOutputRegressor(self.model, n_jobs=-1)
         elif args.model == 'dt':
             self.model = DecisionTreeRegressor(max_depth=args.tree_max_depth)
             if args.forecast_horizon > 1:
@@ -154,15 +157,8 @@ class Regressor(Predictor):
         super().__init__(self.model)
 
     def train_predict_svm(self, train_data, test_data):
-        # Work-around SVM takes forever above O(10^5)
-        if train_data.X.size > 100000:
-            samples = np.random.choice(len(train_data.X), int(len(train_data.X)/4))
-            print("[Predictor.py] WARNING: Train data is too large, it will be sampled in half")
-            X = train_data.X[samples]
-            y = train_data.y[samples]
-        else:
-            X = train_data.X
-            y = train_data.y
+        X = train_data.X
+        y = train_data.y
         self.model.fit(X, y)
         output = self.model.predict(test_data.X)
         return output
